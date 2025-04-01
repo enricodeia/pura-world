@@ -81,11 +81,19 @@
                 <p>Watch our community grow with each new follower</p>
             </div>
             
-            <div class="slider-container">
-                <div class="slider-header">
-                    <div class="slider-label">Followers Count</div>
+            <!-- Follower Management (Updated) -->
+            <div class="follower-management">
+                <div class="follower-count-input">
+                    <label for="exact-follower-count">Total Followers:</label>
+                    <div class="number-input-group">
+                        <input type="number" id="exact-follower-count" min="0" max="3000" value="50">
+                        <div class="number-controls">
+                            <button id="increase-followers"><i class="fas fa-plus"></i></button>
+                            <button id="decrease-followers"><i class="fas fa-minus"></i></button>
+                        </div>
+                        <button class="update-button" id="update-follower-count">Update</button>
+                    </div>
                 </div>
-                <input type="range" id="follower-slider" min="0" max="3000" value="0">
             </div>
             
             <div class="input-group">
@@ -98,55 +106,23 @@
                 </button>
             </div>
             
-            <div class="option-tabs">
-                <div class="tab-selector">
-                    <button class="tab-btn active" data-tab="time">Time</button>
-                    <button class="tab-btn" data-tab="seasons">Season</button>
-                    <button class="tab-btn" data-tab="terrain">Terrain</button>
-                </div>
-                
-                <div class="tab-content active" data-tab="time">
-                    <div class="time-controls">
-                        <button class="time-button active" data-time="day" id="day-btn">
-                            <i class="fas fa-sun"></i> Day
-                        </button>
-                        <button class="time-button" data-time="sunset" id="sunset-btn">
-                            <i class="fas fa-cloud-sun"></i> Sunset
-                        </button>
-                        <button class="time-button" data-time="night" id="night-btn">
-                            <i class="fas fa-moon"></i> Night
-                        </button>
+            <!-- View Controls - Simplified -->
+            <div class="view-settings">
+                <div class="view-option">
+                    <h3>Quality Settings</h3>
+                    <div class="quality-options">
+                        <button class="quality-btn active" data-quality="medium">Medium</button>
+                        <button class="quality-btn" data-quality="high">High</button>
+                        <button class="quality-btn" data-quality="ultra">Ultra</button>
                     </div>
                 </div>
                 
-                <div class="tab-content" data-tab="seasons">
-                    <div class="seasons-controls">
-                        <button class="season-button active" data-season="spring" id="spring-btn">
-                            <i class="fas fa-leaf"></i> Spring
-                        </button>
-                        <button class="season-button" data-season="summer" id="summer-btn">
-                            <i class="fas fa-sun"></i> Summer
-                        </button>
-                        <button class="season-button" data-season="autumn" id="autumn-btn">
-                            <i class="fas fa-tree"></i> Autumn
-                        </button>
-                        <button class="season-button" data-season="winter" id="winter-btn">
-                            <i class="fas fa-snowflake"></i> Winter
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="tab-content" data-tab="terrain">
-                    <div class="terrain-controls">
-                        <button class="terrain-button active" data-terrain="normal" id="normal-terrain-btn">
-                            <i class="fas fa-mountain"></i> Normal
-                        </button>
-                        <button class="terrain-button" data-terrain="hills" id="hills-terrain-btn">
-                            <i class="fas fa-mountain"></i> Hills
-                        </button>
-                        <button class="terrain-button" data-terrain="valleys" id="valleys-terrain-btn">
-                            <i class="fas fa-water"></i> Valleys
-                        </button>
+                <div class="view-option">
+                    <h3>Particle Density</h3>
+                    <div class="particle-options">
+                        <button class="particle-btn" data-density="low">Low</button>
+                        <button class="particle-btn active" data-density="medium">Medium</button>
+                        <button class="particle-btn" data-density="high">High</button>
                     </div>
                 </div>
             </div>
