@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pura Pharma - Instagram Growth Forest</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.7.1/gsap.min.js"></script>
+</head>
+<body>
+    <!-- SVG Icons Definition -->
+    <svg style="display: none;" xmlns="http://www.w3.org/2000/svg">
+        <symbol id="icon-tree" viewBox="0 0 24 24">
+            <path d="M12,2L4.5,20.29L5.21,21H18.79L19.5,20.29L12,2Z" />
+        </symbol>
+        <symbol id="icon-user" viewBox="0 0 24 24">
+            <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
+        </symbol>
+        <symbol id="icon-camera" viewBox="0 0 24 24">
+            <path d="M4,4H7L9,2H15L17,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9Z" />
+        </symbol>
+    </svg>
+
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loading-screen">
+        <div class="loader-logo">
+            <i class="fas fa-seedling"></i>
+        </div>
+        <div class="loader-text">PURA PHARMA</div>
+        <div class="loader-subtitle">Growing Together</div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+    </div>
+    
+    <!-- Three.js Canvas Container -->
+    <div id="canvas-container"></div>
+    
+    <!-- Brand Header -->
+    <div class="brand-header">
+        <div class="logo">
+            <i class="fas fa-seedling"></i>
+        </div>
+        <div class="brand-info">
+            <h1>PURA PHARMA</h1>
+            <p>Growing Together</p>
+        </div>
+    </div>
+    
+    <!-- Experience Timeline -->
+    <div class="experience-bar">
+        <div class="chapter-progress">
+            <div class="chapter-label">
+                <span>Chapter 1</span>
+                <span class="counter" id="follower-counter">0</span>
+            </div>
+            <div class="progress-container">
+                <div class="progress-fill" id="chapter-progress-fill"></div>
+                <div class="progress-text"><span id="current-followers">0</span>/<span id="max-followers">100</span></div>
+            </div>
+        </div>
+        <div class="chapter-markers">
+            <div class="marker" style="left: 25%">Chapter 2</div>
+            <div class="marker" style="left: 50%">Chapter 3</div>
+            <div class="marker" style="left: 75%">Chapter 4</div>
+        </div>
+    </div>
+    
+    <!-- Control Panel -->
+    <div class="control-panel" id="control-panel">
+        <div class="ui-card control-card">
+            <button class="toggle-panel-btn" id="toggle-panel-btn">
+                <i class="fas fa-chevron-left" id="panel-toggle-icon"></i>
+            </button>
+            
+            <div class="card-header">
+                <h2>Instagram Growth Forest</h2>
+                <p>Watch our community grow with each new follower</p>
+            </div>
+            
+            <div class="slider-container">
+                <div class="slider-header">
+                    <div class="slider-label">Followers Count</div>
+                </div>
+                <input type="range" id="follower-slider" min="0" max="3000" value="0">
+            </div>
+            
+            <div class="input-group">
+                <div class="input-wrapper">
+                    <input type="text" id="new-follower" placeholder="Enter follower name...">
+                    <div class="input-validation" id="input-validation"></div>
+                </div>
+                <button class="add-button" id="add-follower-btn">
+                    <i class="fas fa-plus"></i> Add
+                </button>
+            </div>
+            
+            <div class="option-tabs">
+                <div class="tab-selector">
+                    <button class="tab-btn active" data-tab="time">Time</button>
+                    <button class="tab-btn" data-tab="seasons">Season</button>
+                    <button class="tab-btn" data-tab="terrain">Terrain</button>
+                </div>
+                
+                <div class="tab-content active" data-tab="time">
+                    <div class="time-controls">
+                        <button class="time-button active" data-time="day" id="day-btn">
+                            <i class="fas fa-sun"></i> Day
+                        </button>
+                        <button class="time-button" data-time="sunset" id="sunset-btn">
+                            <i class="fas fa-cloud-sun"></i> Sunset
+                        </button>
+                        <button class="time-button" data-time="night" id="night-btn">
+                            <i class="fas fa-moon"></i> Night
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="tab-content" data-tab="seasons">
+                    <div class="seasons-controls">
+                        <button class="season-button active" data-season="spring" id="spring-btn">
+                            <i class="fas fa-leaf"></i> Spring
+                        </button>
+                        <button class="season-button" data-season="summer" id="summer-btn">
+                            <i class="fas fa-sun"></i> Summer
+                        </button>
+                        <button class="season-button" data-season="autumn" id="autumn-btn">
+                            <i class="fas fa-tree"></i> Autumn
+                        </button>
+                        <button class="season-button" data-season="winter" id="winter-btn">
+                            <i class="fas fa-snowflake"></i> Winter
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="tab-content" data-tab="terrain">
+                    <div class="terrain-controls">
+                        <button class="terrain-button active" data-terrain="normal" id="normal-terrain-btn">
+                            <i class="fas fa-mountain"></i> Normal
+                        </button>
+                        <button class="terrain-button" data-terrain="hills" id="hills-terrain-btn">
+                            <i class="fas fa-mountain"></i> Hills
+                        </button>
+                        <button class="terrain-button" data-terrain="valleys" id="valleys-terrain-btn">
+                            <i class="fas fa-water"></i> Valleys
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="action-button" id="view-followers-btn">
+                    <i class="fas fa-users"></i> Followers
+                </button>
+                <button class="action-button primary-button" id="reset-view-btn">
+                    <i class="fas fa-sync-alt"></i> Reset View
+                </button>
+            </div>
+            
+            <div class="import-export">
+                <button class="action-button" id="export-btn">
+                    <i class="fas fa-download"></i> Export Data
+                </button>
+                <button class="action-button" id="import-btn">
+                    <i class="fas fa-upload"></i> Import Data
+                </button>
+                <input type="file" id="import-file" accept=".json" style="display: none;">
+            </div>
+        </div>
+    </div>
+    
+    <!-- Followers Panel -->
+    <div class="followers-panel ui-card" id="followers-panel">
+        <div class="followers-header">
+            <h2>Followers List</h2>
+            <div class="followers-actions">
+                <input type="text" id="follower-search" placeholder="Search followers...">
+                <select id="follower-sort">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="name">Name A-Z</option>
+                </select>
+                <button class="close-followers-btn" id="close-followers-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <ul class="followers-list" id="followers-list"></ul>
+        <div class="followers-footer">
+            <span id="followers-count">0 followers</span>
+        </div>
+    </div>
+    
+    <!-- View Controls -->
+    <div class="view-controls">
+        <button class="view-control-btn" id="first-person-btn" title="First Person View">
+            <i class="fas fa-street-view"></i>
+        </button>
+        <button class="view-control-btn active" id="orbit-btn" title="Orbit View">
+            <i class="fas fa-sync"></i>
+        </button>
+        <button class="view-control-btn" id="top-view-btn" title="Top View">
+            <i class="fas fa-arrows-alt"></i>
+        </button>
+    </div>
+    
+    <!-- Screenshot Button -->
+    <button class="screenshot-btn" id="screenshot-btn" title="Take Screenshot">
+        <i class="fas fa-camera"></i>
+    </button>
+    
+    <!-- Keyboard Controls Info -->
+    <div class="keyboard-controls" id="keyboard-controls">
+        <div>Movement: <span class="key">W</span><span class="key">A</span><span class="key">S</span><span class="key">D</span> or <span class="key">↑</span><span class="key">←</span><span class="key">↓</span><span class="key">→</span></div>
+        <div>Camera: <span class="key">Mouse Drag</span> to rotate, <span class="key">Scroll</span> to zoom</div>
+        <div>Toggle UI: <span class="key">H</span></div>
+    </div>
+    
+    <!-- Tooltip -->
+    <div class="tooltip" id="tooltip">
+        <div class="tooltip-name">Follower Name</div>
+        <div class="tooltip-date">Joined: Date</div>
+    </div>
+    
+    <!-- Screenshot Modal -->
+    <div class="modal" id="screenshot-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Capture Saved</h2>
+                <button class="close-modal-btn" id="close-modal-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="screenshot-container" id="screenshot-container"></div>
+                <p>Right-click on the image to save it or use the buttons below:</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn" id="download-screenshot-btn">
+                    <i class="fas fa-download"></i> Download
+                </button>
+                <button class="modal-btn" id="share-screenshot-btn">
+                    <i class="fas fa-share-alt"></i> Share
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Script -->
+    <script src="main.js"></script>
+</body>
+</html>
