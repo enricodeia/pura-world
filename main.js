@@ -1,8 +1,19 @@
 // Ensure Three.js is loaded before starting
-window.onload = function() {
-    console.log("Window loaded");
-    console.log("THREE available:", typeof THREE !== 'undefined');
-    console.log("GSAP available:", typeof gsap !== 'undefined');
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("Document loaded");
+    
+    // Check if required libraries are available
+    if (typeof THREE === 'undefined') {
+        console.error("THREE.js is not loaded. Please check your script tags.");
+        alert("THREE.js is required but not loaded. Please check your internet connection and reload the page.");
+        return;
+    }
+    
+    if (typeof gsap === 'undefined') {
+        console.error("GSAP is not loaded. Please check your script tags.");
+        alert("GSAP library is required but not loaded. Please check your internet connection and reload the page.");
+        return;
+    }
     
     try {
         // Initialize the Pura Forest application
@@ -10,8 +21,9 @@ window.onload = function() {
         console.log("App initialized successfully");
     } catch (error) {
         console.error("Failed to initialize app:", error);
+        alert("An error occurred while initializing the application. Please check console for details.");
     }
-};
+});
 
 /**
  * Pura Pharma Forest - Enhanced Premium Edition
@@ -1230,59 +1242,34 @@ class PuraForestApp {
         };
         
         // Create different tree types based on quality setting
-        this.treeTemplates.push(this.createHighQualityConifer(treeMaterials));
-        this.treeTemplates.push(this.createHighQualityOak(treeMaterials));
-        this.treeTemplates.push(this.createHighQualityPine(treeMaterials));
-        this.treeTemplates.push(this.createHighQualityMaple(treeMaterials));
-        this.treeTemplates.push(this.createBonsaiTree(treeMaterials));
-        
-        // Add more tree types for higher quality settings
-        if (this.quality === 'high' || this.quality === 'ultra') {
-            this.treeTemplates.push(this.createPalmTree(treeMaterials));
-            this.treeTemplates.push(this.createFloweringTree(treeMaterials));
-        }
+        this.treeTemplates.push(this.createSimpleConifer(treeMaterials));
+        this.treeTemplates.push(this.createSimpleOak(treeMaterials));
+        this.treeTemplates.push(this.createSimplePine(treeMaterials));
+        this.treeTemplates.push(this.createSimpleMaple(treeMaterials));
+        this.treeTemplates.push(this.createSimpleBonsaiTree(treeMaterials));
     }
     
-    createHighQualityConifer(materials) {
+    // Simplified tree creation methods for better performance
+    createSimpleConifer(materials) {
         const tree = new THREE.Group();
         
-        // Create detailed trunk with bark texture
-        const trunkGeometry = new THREE.CylinderGeometry(0.4, 0.6, 6, 10);
+        // Create trunk
+        const trunkGeometry = new THREE.CylinderGeometry(0.4, 0.6, 6, 8);
         const trunkMaterial = new THREE.MeshStandardMaterial(materials.trunk);
-        
-        // Add noise to trunk vertices for more natural look
-        if (this.quality === 'high' || this.quality === 'ultra') {
-            const trunkPositions = trunkGeometry.attributes.position.array;
-            
-            for (let i = 0; i < trunkPositions.length; i += 3) {
-                if (i % 9 !== 0) { // Don't modify top/bottom center points
-                    const noise = (Math.random() - 0.5) * 0.1;
-                    trunkPositions[i] += noise;
-                    trunkPositions[i + 2] += noise;
-                }
-            }
-            
-            trunkGeometry.attributes.position.needsUpdate = true;
-            trunkGeometry.computeVertexNormals();
-        }
         
         const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
         trunk.position.y = 3;
         trunk.castShadow = true;
         tree.add(trunk);
         
-        // Create foliage with multiple layers for realism
-        const layerCount = this.quality === 'ultra' ? 5 : 4;
+        // Create foliage with multiple layers
+        const layerCount = 4;
         
         for (let i = 0; i < layerCount; i++) {
             const y = 4 + i * 2.5;
             const size = 4 - i * 0.7;
             
-            // Use more detailed geometry for higher qualities
-            const foliageGeometry = this.quality === 'ultra' 
-                ? new THREE.ConeGeometry(size, 3, 24)
-                : new THREE.ConeGeometry(size, 3, 16);
-            
+            const foliageGeometry = new THREE.ConeGeometry(size, 3, 16);
             const foliageMaterial = new THREE.MeshStandardMaterial({
                 color: materials.leaves.color,
                 roughness: materials.leaves.roughness,
@@ -1298,7 +1285,7 @@ class PuraForestApp {
         return tree;
     }
     
-    createHighQualityOak(materials) {
+    createSimpleOak(materials) {
         const tree = new THREE.Group();
         
         // Trunk
@@ -1309,38 +1296,6 @@ class PuraForestApp {
         trunk.position.y = 3;
         trunk.castShadow = true;
         tree.add(trunk);
-        
-        // Add branches
-        const addBranch = (startY, length, thickness, angle) => {
-            const branchGeometry = new THREE.CylinderGeometry(thickness * 0.7, thickness, length, 5);
-            branchGeometry.translate(0, length / 2, 0);
-            branchGeometry.rotateZ(angle);
-            
-            const branch = new THREE.Mesh(branchGeometry, trunkMaterial);
-            branch.position.y = startY;
-            branch.castShadow = true;
-            tree.add(branch);
-            
-            // Add leaf clusters
-            const leafCluster = new THREE.Mesh(
-                new THREE.SphereGeometry(length * 0.4, 6, 6),
-                new THREE.MeshStandardMaterial(materials.leaves)
-            );
-            
-            leafCluster.position.set(
-                Math.sin(angle) * length,
-                startY + Math.cos(angle) * length,
-                0
-            );
-            leafCluster.castShadow = true;
-            tree.add(leafCluster);
-        };
-        
-        // Add branches at different heights and angles
-        addBranch(3, 2, 0.2, Math.PI / 4);
-        addBranch(4, 2.2, 0.2, -Math.PI / 4);
-        addBranch(5, 1.8, 0.15, Math.PI / 3);
-        addBranch(5.5, 1.6, 0.15, -Math.PI / 3);
         
         // Main foliage canopy
         const foliageGeometry = new THREE.SphereGeometry(3.5, 10, 10);
@@ -1354,7 +1309,7 @@ class PuraForestApp {
         return tree;
     }
     
-    createHighQualityPine(materials) {
+    createSimplePine(materials) {
         const tree = new THREE.Group();
         
         // Trunk
@@ -1366,8 +1321,8 @@ class PuraForestApp {
         trunk.castShadow = true;
         tree.add(trunk);
         
-        // Foliage - multiple cones with offset
-        const layerCount = 6;
+        // Foliage - multiple cones
+        const layerCount = 5;
         const baseSize = 4;
         const step = 1.5;
         
@@ -1387,26 +1342,15 @@ class PuraForestApp {
         return tree;
     }
     
-    createHighQualityMaple(materials) {
+    createSimpleMaple(materials) {
         const tree = new THREE.Group();
         
-        // Trunk with natural curve
-        const points = [];
-        for (let i = 0; i <= 8; i++) {
-            const y = i * 0.8;
-            const xOffset = i > 2 ? 0.2 * Math.sin((i - 2) / 6 * Math.PI) : 0;
-            points.push(new THREE.Vector3(xOffset, y, 0));
-        }
-        
-        const trunkGeometry = new THREE.LatheGeometry(
-            points, 
-            8,           // Segments around
-            0,           // Start angle
-            Math.PI * 2  // End angle
-        );
-        
+        // Trunk
+        const trunkGeometry = new THREE.CylinderGeometry(0.4, 0.6, 6, 8);
         const trunkMaterial = new THREE.MeshStandardMaterial(materials.trunk);
+        
         const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+        trunk.position.y = 3;
         trunk.castShadow = true;
         tree.add(trunk);
         
@@ -1424,47 +1368,19 @@ class PuraForestApp {
         foliage.castShadow = true;
         tree.add(foliage);
         
-        // Add clusters to create more maple-like shape
-        for (let i = 0; i < 6; i++) {
-            const angle = (i / 6) * Math.PI * 2;
-            const radius = 2.5;
-            
-            const cluster = new THREE.Mesh(
-                new THREE.SphereGeometry(1.5 + Math.random() * 0.5, 6, 6),
-                foliageMaterial
-            );
-            
-            cluster.position.set(
-                Math.cos(angle) * radius,
-                7 + (Math.random() - 0.5) * 2,
-                Math.sin(angle) * radius
-            );
-            
-            cluster.castShadow = true;
-            tree.add(cluster);
-        }
-        
         return tree;
     }
     
-    createBonsaiTree(materials) {
+    createSimpleBonsaiTree(materials) {
         const tree = new THREE.Group();
         
-        // Create curved trunk
-        const curvePoints = [];
-        for (let i = 0; i <= 10; i++) {
-            const t = i / 10;
-            const x = Math.sin(t * Math.PI * 0.5) * 0.3;
-            const y = t * 4;
-            const z = 0;
-            curvePoints.push(new THREE.Vector3(x, y, z));
-        }
-        
-        const trunkCurve = new THREE.CatmullRomCurve3(curvePoints);
-        const trunkGeometry = new THREE.TubeGeometry(trunkCurve, 10, 0.3, 8, false);
+        // Trunk
+        const trunkGeometry = new THREE.CylinderGeometry(0.3, 0.4, 4, 8);
         const trunkMaterial = new THREE.MeshStandardMaterial(materials.trunk);
         
         const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+        trunk.position.y = 2;
+        trunk.rotation.z = 0.2; // Slight tilt
         trunk.castShadow = true;
         tree.add(trunk);
         
@@ -1478,247 +1394,12 @@ class PuraForestApp {
         
         const foliage = new THREE.Mesh(foliageGeometry, foliageMaterial);
         foliage.position.y = 4;
+        foliage.position.x = 0.5; // Offset to match trunk tilt
         foliage.scale.set(1.2, 0.7, 1.2); // Flattened sphere
         foliage.castShadow = true;
         tree.add(foliage);
         
         return tree;
-    }
-    
-    createPalmTree(materials) {
-        const tree = new THREE.Group();
-        
-        // Trunk
-        const trunkHeight = 8;
-        const trunkRadius = 0.3;
-        const trunkSegments = 8;
-        
-        // Create curved trunk
-        const trunkPoints = [];
-        for (let i = 0; i <= trunkSegments; i++) {
-            const y = (i / trunkSegments) * trunkHeight;
-            const offset = 0.3 * Math.sin((i / trunkSegments) * Math.PI);
-            trunkPoints.push(new THREE.Vector3(offset, y, 0));
-        }
-        
-        const trunkCurve = new THREE.CatmullRomCurve3(trunkPoints);
-        const trunkGeometry = new THREE.TubeGeometry(trunkCurve, 10, trunkRadius, 8, false);
-        const trunkMaterial = new THREE.MeshStandardMaterial({
-            color: 0xa1887f,
-            roughness: 0.9,
-            metalness: 0.1
-        });
-        
-        const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
-        trunk.castShadow = true;
-        tree.add(trunk);
-        
-        // Create palm leaves
-        const leafCount = 7;
-        for (let i = 0; i < leafCount; i++) {
-            const angle = (i / leafCount) * Math.PI * 2;
-            
-            const leafGroup = new THREE.Group();
-            
-            // Create leaf stem
-            const stemCurve = new THREE.QuadraticBezierCurve3(
-                new THREE.Vector3(0, 0, 0),
-                new THREE.Vector3(Math.cos(angle) * 1.5, 0.5, Math.sin(angle) * 1.5),
-                new THREE.Vector3(Math.cos(angle) * 3, -0.5, Math.sin(angle) * 3)
-            );
-            
-            const stemGeometry = new THREE.TubeGeometry(stemCurve, 8, 0.1, 8, false);
-            const stemMaterial = new THREE.MeshStandardMaterial({
-                color: 0x7cb342,
-                roughness: 0.8,
-                metalness: 0.1
-            });
-            
-            const stem = new THREE.Mesh(stemGeometry, stemMaterial);
-            leafGroup.add(stem);
-            
-            // Create leaf blade
-            const leafShape = new THREE.Shape();
-            leafShape.moveTo(0, 0);
-            leafShape.bezierCurveTo(0.5, 0.2, 2, 0.5, 3, 0);
-            leafShape.bezierCurveTo(2, -0.5, 0.5, -0.2, 0, 0);
-            
-            const leafGeometry = new THREE.ShapeGeometry(leafShape, 16);
-            const leafMaterial = new THREE.MeshStandardMaterial({
-                color: 0x4caf50,
-                roughness: 0.8,
-                metalness: 0.05,
-                side: THREE.DoubleSide
-            });
-            
-            // Create multiple leaf segments
-            const segmentCount = 5;
-            for (let j = 0; j < segmentCount; j++) {
-                const t = j / (segmentCount - 1);
-                const point = stemCurve.getPointAt(t);
-                const tangent = stemCurve.getTangentAt(t);
-                
-                const leafSegment = new THREE.Mesh(leafGeometry, leafMaterial);
-                leafSegment.position.copy(point);
-                
-                // Orient leaf to follow stem
-                const normal = new THREE.Vector3(0, 1, 0);
-                const binormal = new THREE.Vector3().crossVectors(tangent, normal).normalize();
-                
-                leafSegment.lookAt(point.clone().add(tangent));
-                leafSegment.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2);
-                
-                // Scale leaf segments
-                const scale = 0.2 + t * 0.3;
-                leafSegment.scale.set(scale, scale, scale);
-                
-                leafGroup.add(leafSegment);
-            }
-            
-            // Position at top of trunk
-            leafGroup.position.y = trunkHeight;
-            
-            // Random rotation variation
-            leafGroup.rotation.x = (Math.random() - 0.5) * 0.2;
-            leafGroup.rotation.z = (Math.random() - 0.5) * 0.2;
-            
-            tree.add(leafGroup);
-        }
-        
-        return tree;
-    }
-    
-    createFloweringTree(materials) {
-        const tree = new THREE.Group();
-        
-        // Trunk
-        const trunkGeometry = new THREE.CylinderGeometry(0.3, 0.4, 5, 8);
-        const trunkMaterial = new THREE.MeshStandardMaterial(materials.trunk);
-        
-        const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
-        trunk.position.y = 2.5;
-        trunk.castShadow = true;
-        tree.add(trunk);
-        
-        // Branches
-        const addBranch = (startY, length, thickness, angle, zAngle) => {
-            const branchGeometry = new THREE.CylinderGeometry(thickness * 0.6, thickness, length, 5);
-            branchGeometry.translate(0, length / 2, 0);
-            branchGeometry.rotateZ(angle);
-            
-            const branch = new THREE.Mesh(branchGeometry, trunkMaterial);
-            branch.position.y = startY;
-            branch.rotation.y = zAngle;
-            branch.castShadow = true;
-            tree.add(branch);
-            
-            // Add flowers at end of branch
-            if (this.quality === 'high' || this.quality === 'ultra') {
-                this.addFlowers(
-                    Math.sin(angle) * length,
-                    startY + Math.cos(angle) * length,
-                    0,
-                    tree,
-                    zAngle
-                );
-            }
-        };
-        
-        // Add branches
-        const branchCount = this.quality === 'ultra' ? 5 : 3;
-        for (let i = 0; i < branchCount; i++) {
-            const y = 3 + i * 0.5;
-            const angle = Math.PI / 3 + (Math.random() - 0.5) * 0.2;
-            const zAngle = Math.PI * 2 * (i / branchCount);
-            
-            addBranch(y, 1.5, 0.15, angle, zAngle);
-        }
-        
-        // Foliage
-        const foliageGeometry = new THREE.SphereGeometry(2, 8, 8);
-        const foliageMaterial = new THREE.MeshStandardMaterial({
-            color: 0x66bb6a,
-            roughness: 0.8,
-            metalness: 0.05
-        });
-        
-        const foliage = new THREE.Mesh(foliageGeometry, foliageMaterial);
-        foliage.position.y = 5;
-        foliage.castShadow = true;
-        tree.add(foliage);
-        
-        // Add flowers throughout foliage
-        if (this.quality === 'high' || this.quality === 'ultra') {
-            const flowerCount = this.quality === 'ultra' ? 15 : 8;
-            for (let i = 0; i < flowerCount; i++) {
-                const angle = Math.random() * Math.PI * 2;
-                const radius = Math.random() * 1.8;
-                const y = 5 + (Math.random() - 0.5) * 1.5;
-                
-                this.addFlowers(
-                    Math.cos(angle) * radius,
-                    y,
-                    Math.sin(angle) * radius,
-                    tree
-                );
-            }
-        }
-        
-        return tree;
-    }
-    
-    addFlowers(x, y, z, parent, rotationY = 0) {
-        const flowerCount = this.quality === 'ultra' ? 5 : 3;
-        const flowerGroup = new THREE.Group();
-        flowerGroup.position.set(x, y, z);
-        flowerGroup.rotation.y = rotationY;
-        
-        for (let i = 0; i < flowerCount; i++) {
-            // Flower center
-            const centerGeometry = new THREE.SphereGeometry(0.1, 8, 8);
-            const centerMaterial = new THREE.MeshBasicMaterial({ color: 0xffeb3b });
-            
-            const center = new THREE.Mesh(centerGeometry, centerMaterial);
-            
-            // Position with slight offset
-            const offsetX = (Math.random() - 0.5) * 0.3;
-            const offsetY = (Math.random() - 0.5) * 0.3;
-            const offsetZ = (Math.random() - 0.5) * 0.3;
-            
-            center.position.set(offsetX, offsetY, offsetZ);
-            
-            // Petals
-            const petalCount = 5;
-            const petalColor = Math.random() > 0.5 ? 0xec407a : 0xf48fb1; // Different pink shades
-            
-            for (let j = 0; j < petalCount; j++) {
-                const angle = (j / petalCount) * Math.PI * 2;
-                
-                const petalGeometry = new THREE.CircleGeometry(0.15, 6);
-                const petalMaterial = new THREE.MeshBasicMaterial({
-                    color: petalColor,
-                    side: THREE.DoubleSide
-                });
-                
-                const petal = new THREE.Mesh(petalGeometry, petalMaterial);
-                petal.position.copy(center.position);
-                petal.position.x += Math.cos(angle) * 0.1;
-                petal.position.z += Math.sin(angle) * 0.1;
-                
-                // Orient petal
-                petal.lookAt(
-                    petal.position.x + Math.cos(angle),
-                    petal.position.y,
-                    petal.position.z + Math.sin(angle)
-                );
-                
-                flowerGroup.add(petal);
-            }
-            
-            flowerGroup.add(center);
-        }
-        
-        parent.add(flowerGroup);
     }
     
     setupSampleData() {
@@ -1744,20 +1425,13 @@ class PuraForestApp {
         const firstNames = [
             "Emma", "Liam", "Olivia", "Noah", "Ava", "Ethan", "Sophia", "Mason", 
             "Isabella", "Jacob", "Mia", "Lucas", "Charlotte", "Alexander", "Amelia", 
-            "Benjamin", "Harper", "William", "Evelyn", "James", "Abigail", "Elijah", 
-            "Emily", "Oliver", "Elizabeth", "Daniel", "Sofia", "Matthew", "Avery", "Jackson",
-            "Aria", "David", "Zoe", "Joseph", "Camila", "Carter", "Penelope", "Owen",
-            "Riley", "Henry", "Layla", "Wyatt", "Nora", "John", "Lily", "Luke", "Eleanor",
-            "Gabriel", "Hannah"
+            "Benjamin", "Harper", "William", "Evelyn", "James"
         ];
         
         const lastNames = [
             "Smith", "Johnson", "Williams", "Jones", "Brown", "Davis", "Miller", "Wilson",
             "Moore", "Taylor", "Anderson", "Thomas", "Jackson", "White", "Harris", "Martin",
-            "Thompson", "Garcia", "Martinez", "Robinson", "Clark", "Rodriguez", "Lewis", "Lee",
-            "Walker", "Hall", "Allen", "Young", "Hernandez", "King", "Wright", "Lopez", "Hill",
-            "Scott", "Green", "Adams", "Baker", "Gonzalez", "Nelson", "Carter", "Mitchell",
-            "Perez", "Roberts", "Turner", "Phillips", "Campbell", "Parker", "Evans", "Edwards"
+            "Thompson", "Garcia", "Martinez", "Robinson"
         ];
         
         for (let i = 0; i < count; i++) {
@@ -2378,7 +2052,7 @@ class PuraForestApp {
         ];
         
         // Store visibility state
-        const visibilityStates = uiElements.map(el => el.style.display);
+        const visibilityStates = uiElements.map(el => el && el.style ? el.style.display : '');
         
         // Hide UI elements
         uiElements.forEach(el => {
@@ -2641,8 +2315,9 @@ class PuraForestApp {
                 const MAX_PITCH = Math.PI / 2 - 0.1;
                 this.camera.rotation.x = Math.max(-MAX_PITCH, Math.min(MAX_PITCH, newPitch));
             }
-            
-            this.cameraControls.lastMouseX = event.clientX;
+
+
+        this.cameraControls.lastMouseX = event.clientX;
             this.cameraControls.lastMouseY = event.clientY;
         }
         
